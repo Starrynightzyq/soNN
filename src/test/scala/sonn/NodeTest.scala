@@ -1,5 +1,8 @@
 package sonn
 
+// import org.scalatest._
+// import chiseltest._
+// import chisel3._
 import java.io.File
 import scala.util._
 import org.scalatest._
@@ -53,14 +56,15 @@ class NodeTest extends FlatSpec with ChiselScalatestTester with Matchers {
         val rstart = -100
         val rend   = 100
         val testPositon = for { x <- 0 to 10; y <- 0 to 10} yield (x, y)
+        println(testPositon.toString())
         val inputSeq = testPositon.map { case (x, y) => 
             (new dataPackage(16)).Lit(_.data -> (rstart + r.nextInt(rend-rstart+1)).S, _.dataType -> 0.U, _.positon.row -> x.S, _.positon.col -> y.S)
         }
 
-        val resPosition = for { x <- 0 to 0; y <- 3 to 3} yield (x, y)
-        val resSeq = resPosition.map { case (x, y) => 
-            (new dataPackage(16)).Lit(_.data -> (rstart + r.nextInt(rend-rstart+1)).S, _.dataType -> 0.U, _.positon.row -> x.S, _.positon.col -> y.S)
-        }
+        // val resPosition = for { x <- 0 to 0; y <- 3 to 3} yield (x, y)
+        // val resSeq = resPosition.map { case (x, y) => 
+        //     (new dataPackage(16)).Lit(_.data -> (rstart + r.nextInt(rend-rstart+1)).S, _.dataType -> 0.U, _.positon.row -> x.S, _.positon.col -> y.S)
+        // }
 
         dut.io.dataPackageIn.enqueueSeq(inputSeq)
 
@@ -70,5 +74,24 @@ class NodeTest extends FlatSpec with ChiselScalatestTester with Matchers {
         //     dut.io.dataPackageOut.expectDequeueSeq(resSeq)
         // }.join()
 
+
+        // val r = scala.util.Random
+        // val rstart = -100
+        // val rend   = 100
+
+        // dut.io.dataPackageIn.valid.poke(1)
+        // dut.io.dataPackageOut.ready.poke(1)
+        // for (i <- 0 until 16) {
+        //     for (j <- 0 until 16) {
+        //         dut.io.dataPackageIn.bits.data.poke((rstart + r.nextInt(rend-rstart+1)).S)
+        //         dut.io.dataPackageIn.bits.dataType.poke(1.U)
+        //         dut.io.dataPackageIn.bits.positon.row.poke(i.U)
+        //         dut.io.dataPackageIn.bits.positon.col.poke(j.U)
+        //         step(1)
+        //     }
+        // }
+
     }
 }
+
+

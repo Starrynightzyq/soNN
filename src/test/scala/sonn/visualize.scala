@@ -19,22 +19,22 @@ object visualizePE extends App {
   val targetDir = "test_run_dir/PE"
   (new ElkStage).execute(
     Array("-td", targetDir),
-    Seq(ChiselGeneratorAnnotation(() => new PE( 256, 256, 256, 16, (0, 3))))
+    Seq(ChiselGeneratorAnnotation(() => new PE(16)))
   )
 }
 
-object visualizePETop extends App {
-  val targetDir = "test_run_dir/PETop"
-  (new ElkStage).execute(
-    Array("-td", targetDir),
-    Seq(ChiselGeneratorAnnotation(() => new PETop((0, 3), 16)))
-  )
-}
+// object visualizePETop extends App {
+//   val targetDir = "test_run_dir/PETop"
+//   (new ElkStage).execute(
+//     Array("-td", targetDir),
+//     Seq(ChiselGeneratorAnnotation(() => new PETop((0, 3), 16)))
+//   )
+// }
 
-object visualizePEArray extends App {
-  val targetDir = "test_run_dir/PEArray"
-  (new ElkStage).execute(
-    Array("-td", targetDir),
-    Seq(ChiselGeneratorAnnotation(() => new PEArray((3, 4), 16)))
-  )
-}
+// object visualizePEArray extends App {
+//   val targetDir = "test_run_dir/PEArray"
+//   (new ElkStage).execute(
+//     Array("-td", targetDir),
+//     Seq(ChiselGeneratorAnnotation(() => new PEArray((3, 4), 16)))
+//   )
+// }

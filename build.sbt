@@ -52,6 +52,7 @@ libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.3.0" % "test"
 libraryDependencies += "org.scalatest" %% "scalatest-flatspec" % "3.2.9" % "test"
 libraryDependencies += "com.github.sbt" % "junit-interface" % "0.13.2" % Test
 libraryDependencies += "org.easysoc" %% "layered-firrtl" % "1.1.+"
+libraryDependencies += "org.scalanlp" %% "breeze" % "1.2"
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 

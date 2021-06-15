@@ -48,7 +48,7 @@ import chisel3.tester.RawTester.test
 // }
 
 class NodeTest extends FlatSpec with ChiselScalatestTester with Matchers {
-    test(new Node(false, (0, 3), 16)) { dut =>
+    test(new Node(false, (0, 3), 16, 5)) { dut =>
         dut.io.dataPackageIn.initSource().setSourceClock(dut.clock)
         dut.io.dataPackageOut.initSink().setSinkClock(dut.clock)
 

@@ -8,7 +8,7 @@ object getVerilogNode extends App {
   println("generate node verilog")
   (new ChiselStage).execute(
     Array("-X", "verilog", "--target-dir", "test_run_dir/Node"),
-    Seq(ChiselGeneratorAnnotation(() => new Node(false, (0, 3), 16))))
+    Seq(ChiselGeneratorAnnotation(() => new Node(false, (0, 3), 16, 5))))
 }
 
 object getVerilogPECore extends App {
@@ -30,4 +30,11 @@ object getVerilogPE extends App {
   (new ChiselStage).execute(
     Array("-X", "verilog", "--target-dir", "test_run_dir/PE"),
     Seq(ChiselGeneratorAnnotation(() => new PE)))
+}
+
+object getVerilogPEArray extends App {
+  println("generate PEArray verilog")
+  (new ChiselStage).execute(
+    Array("-X", "verilog", "--target-dir", "test_run_dir/PEArray"),
+    Seq(ChiselGeneratorAnnotation(() => new PEArray((3, 4), 16, 256))))
 }

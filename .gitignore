@@ -9,6 +9,7 @@
 !build.sbt
 !build.sc
 !README.md
+!.scalafmt.conf
 
 .*/
 project/
@@ -16,3 +17,4 @@ target/
 test_run_dir/
 vivado_proj/
 bak/
+DW_ram_r_w_s_dff.v

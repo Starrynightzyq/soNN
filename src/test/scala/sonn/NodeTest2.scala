@@ -31,7 +31,7 @@ class NodeTester extends ChiselFlatSpec {
     iotesters.Driver.execute(
       Array("--generate-vcd-output", "on", "--target-dir", "test_run_dir/Node", "--top-name", "make_Test_vcd",
         "--backend-name", "verilator"),
-      () => new Node(false, (0, 3), 16)
+      () => new Node(false, (0, 3), 16, 5)
     ) {
       c => new NodeTest2(c)
     } should be(true)

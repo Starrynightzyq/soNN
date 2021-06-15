@@ -10,11 +10,11 @@ class Positon(val w: Int) extends Bundle {
 
 class dataPackage(val w: Int) extends Bundle {
   val data = SInt(w.W)
-  val dataType = UInt(1.W)
+  val dataType = UInt(2.W)
   val positon = new Positon(8)
 }
 
-class Node(row: Boolean, positon: (Int, Int), w: Int) extends Module {
+class Node(row: Boolean, positon: (Int, Int), w: Int, fifolen: Int) extends Module {
   val io = IO(new Bundle {
     val dataPackageIn = Flipped(DecoupledIO(new dataPackage(w)))
     val dataPackageOut = DecoupledIO(new dataPackage(w))
@@ -25,9 +25,9 @@ class Node(row: Boolean, positon: (Int, Int), w: Int) extends Module {
   core.dontTouch(x)
   core.dontTouch(y)
 
-  // dataPackageIn 经过一个深度为 5 的 fifo 到达 dataPackageOut
+  // dataPackageIn 经过一个深度为 fifolen 的 fifo 到达 dataPackageOut
   val qIn = Wire(io.dataPackageIn.cloneType)
-  val q = Queue(qIn, 5)
+  val q = Queue(qIn, fifolen)
 
   qIn <> io.dataPackageIn
   q <> io.dataPackageOut

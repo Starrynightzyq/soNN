@@ -3,7 +3,7 @@ package sonn
 import chisel3._
 import chisel3.util._
 
-class PETesterTop(w:Int=16) extends Module{
+class PETestTop(w:Int=16) extends Module{
     val io = IO(new Bundle{
         val stateSW = Input(UInt(2.W))
         val peconfig = Flipped(DecoupledIO(new PEConfigReg(16)))
@@ -13,7 +13,7 @@ class PETesterTop(w:Int=16) extends Module{
         val pSumOut = Decoupled(SInt(w.W))
         val stateOut = Output(UInt(4.W))
     })
-    val pe = Module(new PE(16))
+    val pe = Module(new PE)
     val fIn = Queue(io.filter, 256)
     val iIn = Queue(io.ifmap, 256)
     val pSumIn = Queue(io.pSumIn, 256)
@@ -24,7 +24,7 @@ class PETesterTop(w:Int=16) extends Module{
     oSumOut2 <> io.pSumOut
     pe.io.filter <> fIn
     pe.io.ifmap <> iIn
-    pe.io.regConfig <> io.peconfig
+    pe.io.peconfig <> io.peconfig
     pe.io.pSumIn <> pSumIn
     pe.io.stateSW := io.stateSW
 

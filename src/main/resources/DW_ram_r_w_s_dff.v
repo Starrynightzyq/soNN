@@ -46,7 +46,7 @@
   module DW_ram_r_w_s_dff (clk, rst_n, cs_n, wr_n, rd_addr, wr_addr, data_in, 
 			   data_out);
 
-   parameter data_width = 16;
+   parameter data_width = 64;
    parameter depth = 256;
    parameter rst_mode = 0;
    

@@ -11,23 +11,23 @@ object getVerilogNode extends App {
     Seq(ChiselGeneratorAnnotation(() => new Node(false, (0, 3), 16))))
 }
 
+object getVerilogPECore extends App {
+  println("generate PECore verilog")
+  (new ChiselStage).execute(
+    Array("-X", "verilog", "--target-dir", "test_run_dir/PECore"),
+    Seq(ChiselGeneratorAnnotation(() => new PECore(16))))
+}
+
+// object getVerilogPETesterTop extends App {
+//   println("generate PETesterTop verilog")
+//   (new ChiselStage).execute(
+//     Array("-X", "verilog", "--target-dir", "test_run_dir/PETesterTop"),
+//     Seq(ChiselGeneratorAnnotation(() => new PETesterTop(16))))
+// }
+
 object getVerilogPE extends App {
   println("generate PE verilog")
   (new ChiselStage).execute(
     Array("-X", "verilog", "--target-dir", "test_run_dir/PE"),
-    Seq(ChiselGeneratorAnnotation(() => new PE(16))))
+    Seq(ChiselGeneratorAnnotation(() => new PE)))
 }
-
-object getVerilogPETesterTop extends App {
-  println("generate PETesterTop verilog")
-  (new ChiselStage).execute(
-    Array("-X", "verilog", "--target-dir", "test_run_dir/PETesterTop"),
-    Seq(ChiselGeneratorAnnotation(() => new PETesterTop(16))))
-}
-
-// object getVerilogPEArray extends App {
-//   println("generate PEArray verilog")
-//   (new ChiselStage).execute(
-//     Array("-X", "verilog", "--target-dir", "test_run_dir/PEArray"),
-//     Seq(ChiselGeneratorAnnotation(() => new PEArray((3, 4), 16))))
-// }

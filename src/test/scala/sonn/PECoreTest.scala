@@ -9,7 +9,7 @@ import chisel3.util._
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
 
-class PETest(c: PETestTop) extends PeekPokeTester(c) {
+class PECoreTest(c: PECoreTestTop) extends PeekPokeTester(c) {
     poke(c.io.stateSW, 0)
     step(1)
     poke(c.io.peconfig.valid, 1)
@@ -30,8 +30,8 @@ class PETest(c: PETestTop) extends PeekPokeTester(c) {
     poke(c.io.peconfig.valid, 0)
     // first: let PE in idle and input data to input FIFO
     val filter1D: List[Int] = List(-5, -5, 4, -5, 4, -2, 4, 3, -3, -1, -2, 3, 1, 0, -5, 0, 1, -3)
-    val ifmap1D: List[Int] = List(-3, -5, -5, 3, 3, 3, 0, -5, -5, -3)
-    val pSum1D: List[Int] = List(1, 1, 1, 2, 2, 2, 3, 3, 3)
+    val ifmap1D: List[Int] = List(-3, -5, -5, 3, 3, 3)
+    val pSum1D: List[Int] = List(1, 1, 1)
     for (i <- filter1D.indices) {
         poke(c.io.filter.valid, 1)
         poke(c.io.filter.bits, filter1D(i))
@@ -56,24 +56,20 @@ class PETest(c: PETestTop) extends PeekPokeTester(c) {
     step(1)
     // second: let PE in getData, it will get data from FIFO
     poke(c.io.stateSW, 1)
-    step(1)
-    poke(c.io.stateSW, 0)
-    step(1)
-    poke(c.io.pSumOut.ready, 1)
     for (i <- Range(0, 200)) {
         step(1)
     }
 }
 
-class PETester extends ChiselFlatSpec {
+class PECoreTester extends ChiselFlatSpec {
   "running with --generate-vcd-output on" should "create a vcd file from your test" in {
     iotesters.Driver.execute(
-      Array("--generate-vcd-output", "on", "--target-dir", "test_run_dir/PE", "--top-name", "make_Test_vcd",
+      Array("--generate-vcd-output", "on", "--target-dir", "test_run_dir/PECore", "--top-name", "make_Test_vcd",
         "--backend-name", "verilator"),
-      () => new PETestTop
+      () => new PECoreTestTop(16)
     ) {
-      c => new PETest(c)
+      c => new PECoreTest(c)
     } should be(true)
-    new File("test_run_dir/PE/PETestTop.vcd").exists should be(true)
+    new File("test_run_dir/PECore/PECoreTestTop.vcd").exists should be(true)
   }
 }

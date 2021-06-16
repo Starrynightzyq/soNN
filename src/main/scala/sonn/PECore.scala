@@ -152,6 +152,11 @@ class PECore(w:Int = 16)
         is(done) {
             // addCnt.value := 0.U
             clrCnt.value := 0.U
+            // when(io.stateSW === idle){
+            //     state := idle
+            // }.elsewhen(io.stateSW === cal){
+            //     state := cal
+            // }
             state := idle
             // switch(io.stateSW){
             //     is(cal){

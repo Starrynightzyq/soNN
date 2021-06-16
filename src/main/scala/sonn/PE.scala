@@ -134,7 +134,7 @@ class PE(
       when(pstate === pdone) {
         trashCnt.value := 0.U
         pstateSWReg := idle
-        when(colCnt.value === configReg.ofmapW - 1.U) {
+        when(colCnt.value >= configReg.ofmapW - 1.U) {
           state := alldone
         }.otherwise {
           state := hmove
@@ -164,7 +164,12 @@ class PE(
     }
     is(alldone) {
       pstateSWReg := idle
-      state := idle
+      when(io.stateSW === idle){
+        state := idle
+      }.elsewhen(io.stateSW === getdata){
+        state := getdata
+      }
+      // state := idle
     }
   }
 }

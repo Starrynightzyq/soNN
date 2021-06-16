@@ -10,7 +10,7 @@ class Positon(val w: Int) extends Bundle {
 
 class dataPackage(val w: Int) extends Bundle {
   val data = SInt(w.W)
-  val dataType = UInt(2.W)
+  val dataType = UInt(2.W) // 0->filter; 1->ifmap; 2->pSum
   val positon = new Positon(8)
 }
 

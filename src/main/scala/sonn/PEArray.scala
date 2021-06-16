@@ -5,7 +5,7 @@ import chisel3.internal.naming.chiselName
 import chisel3.util._
 
 @chiselName
-class PEArray(val shape: (Int, Int), w: Int = 16, nodefifolen: Int = 256)
+class PEArray(val shape: (Int, Int), w: Int = 16, nodefifolen: Int = 5, pefifolen: Int = 256)
     extends Module {
   val io = IO(new Bundle {
     val dataIn = Flipped(DecoupledIO(new dataPackage(w).cloneType))
@@ -23,15 +23,17 @@ class PEArray(val shape: (Int, Int), w: Int = 16, nodefifolen: Int = 256)
   }
 
   val NoC = List[List[Node]]().toBuffer
-  val pes = List[List[PE]]().toBuffer
+  val pes = List[List[PETop]]().toBuffer
+  val dss = List[List[dataSwitch]]().toBuffer
 
   for (i <- Range(0, shape._1)) {
     val tempNoC = List[Node]().toBuffer
-    val tempPE = List[PE]().toBuffer
+    val tempPE = List[PETop]().toBuffer
+    val tempds = List[dataSwitch]().toBuffer
     for (j <- Range(0, shape._2 + 1)) { // 第 0 列是列广播器
       val node = Module(new Node(j == 0, (i, j), w, nodefifolen))
       if (j != 0) {
-        val pe = Module(new PE)
+        val pe = Module(new PETop)
         val ds = Module(new dataSwitch())
         ds.io.dataIn <> node.io.dataPackageOut
         pe.io.filter <> ds.io.filter
@@ -57,11 +59,13 @@ class PEArray(val shape: (Int, Int), w: Int = 16, nodefifolen: Int = 256)
           }
         }
         tempPE.append(pe)
+        tempds.append(ds)
       }
       tempNoC.append(node)
     }
     NoC.append(tempNoC.toList)
     pes.append(tempPE.toList)
+    dss.append(tempds.toList)
   }
 
   // NoC valid and bits

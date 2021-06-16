@@ -10,7 +10,12 @@ import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
 
 class PETest(c: PETestTop) extends PeekPokeTester(c) {
-    poke(c.io.stateSW, 0)
+
+  val idle :: cal :: padd :: pdone :: hmove :: getdata :: alldone :: Nil = Enum(
+    7
+  )
+
+    poke(c.io.stateSW, idle)
     step(1)
     poke(c.io.peconfig.valid, 1)
     poke(c.io.peconfig.bits.ichannelNum, 2)
@@ -55,14 +60,27 @@ class PETest(c: PETestTop) extends PeekPokeTester(c) {
     poke(c.io.pSumIn.valid, 0)
     step(1)
     // second: let PE in getData, it will get data from FIFO
-    poke(c.io.stateSW, 1)
+    poke(c.io.stateSW, getdata)
     step(1)
-    poke(c.io.stateSW, 0)
+    poke(c.io.stateSW, alldone)
     step(1)
     poke(c.io.pSumOut.ready, 1)
     for (i <- Range(0, 200)) {
-        step(1)
+      if (peek(c.io.pSumOut.valid) == 1) {
+        println(peek(c.io.pSumOut.bits).toString())
+      }
+      step(1)
     }
+    // var ocnt = 0
+    // println("pSumOut")
+    // while (ocnt < 9) {
+    //   if (peek(c.io.pSumOut.valid) == 1) {
+    //     ocnt = ocnt + 1
+    //     println(peek(c.io.pSumOut.bits).toString())
+    //   }
+    //   step(1)
+    // }
+    // println("done")
 }
 
 class PETester extends ChiselFlatSpec {

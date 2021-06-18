@@ -34,8 +34,12 @@ class PEArrayTest(c: PEArrayTestTop) extends PeekPokeTester(c) {
     SW.randomMatrix((filterK, filterK))
   )
   val ifmaps = DenseMatrix.fill(ichannelNum, 1)(SW.randomMatrix(ifmapW, ifmapH))
+  val bias = SW.randomMatrix(ochannelNum, 1)
+  // val bias = DenseMatrix.fill(ochannelNum, 1)(0)
 
-  val bias: List[Int] = List(0, 0, 0)
+
+  // 行为级仿真
+  val sw = model.conv4d(filters, ifmaps, bias, ichannelNum, ochannelNum, filterK, ofmapW, ofmapH, stepW, stepH, (relu==1))
 
   println("filters: ")
   filters.map((x) => {
@@ -120,30 +124,59 @@ class PEArrayTest(c: PEArrayTestTop) extends PeekPokeTester(c) {
   step(1)
 
   // bias
-  for (arraycol <- Range(0, ofmapH)) {
+  // for (arraycol <- Range(0, ofmapH)) {
+  for (ocol <- Range(0, ofmapW)) {
     for (oc <- Range(0, ochannelNum)) {
-      for (ocol <- Range(0, ofmapW)) {
-        assert(peek(c.io.dataIn.ready) == 1)
-        poke(c.io.dataIn.valid, 1.U)
-        poke(c.io.dataIn.bits.data, 1.S)
-        poke(c.io.dataIn.bits.dataType, 2.U)
-        poke(c.io.dataIn.bits.positon.row, 0)
-        poke(c.io.dataIn.bits.positon.col, -1)
-        step(1)
-      }
+      assert(peek(c.io.dataIn.ready) == 1)
+      poke(c.io.dataIn.valid, 1.U)
+      // poke(c.io.dataIn.bits.data, 0.S)
+      poke(c.io.dataIn.bits.data, bias(oc, 0))
+      poke(c.io.dataIn.bits.dataType, 2.U)
+      poke(c.io.dataIn.bits.positon.row, 0)
+      poke(c.io.dataIn.bits.positon.col, -1)
+      step(1)
     }
   }
+  // }
   poke(c.io.dataIn.valid, 0.U)
   step(1)
 
+  println("ofmaps:")
+  var ofmaps = DenseMatrix.fill(ochannelNum, 1)(DenseMatrix.fill(ofmapH, ofmapW)(0))
+  var ocnt = 0
+  var colcnt = 0
+  var error = 0
+  while (peek(c.io.done) == 0) {
+    if(peek(c.io.oSumOut(0).valid) == 1){
+      for (i <- c.io.oSumOut.indices) {
+        var otmp = 0
+        otmp = peek(c.io.oSumOut(i).bits).toInt
+        // println(s"i = ${i}, o = ${otmp}")
 
-  // while (peek(c.io.done) == 0) {
-  //   step(1)
-  // }
+        ofmaps(ocnt,0)(i,colcnt) = otmp
 
-  for (i <- Range(0, 1000)) {
-      step(1)
+        expect(c.io.oSumOut(i).bits, sw(ocnt,0)(i,colcnt))
+        if (otmp != sw(ocnt,0)(i,colcnt)) {
+          error += 1
+        }
+
+      }
+      if(ocnt == ochannelNum-1){
+        ocnt = 0
+        colcnt = colcnt + 1
+      }else{
+        ocnt = ocnt + 1
+      }
+    }
+    step(1)
   }
+  // println(s"ocnt = ${ocnt}, colcnt = ${colcnt}")
+  println(ofmaps.toString())
+  println()
+  println("behavioral model ofmaps:")
+  println(sw.toString())
+  println()
+  println(s"===============ERROR: ${error}======================")
 }
 
 class PEArrayTester extends ChiselFlatSpec {

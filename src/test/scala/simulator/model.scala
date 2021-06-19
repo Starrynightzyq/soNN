@@ -36,6 +36,7 @@ object model {
               for (kcolcnt <- Range(0, filterK)){ // 卷积核列
                 val ifmap_row = orowcnt * stepH + krowcnt
                 val ifmap_col = ocolcnt * stepW + kcolcnt
+                // println(s"orowcnt = ${orowcnt}, stepH = ${stepH}, krowcnt = ${krowcnt}, ifmap_row = ${ifmap_row}")
                 val ifmapdata = ifmaps(ichlcnt, 0)(ifmap_row, ifmap_col)
                 val filterdata = filters(ichlcnt, ochlcnt)(krowcnt, kcolcnt)
                 tmpsum = tmpsum + ifmapdata * filterdata

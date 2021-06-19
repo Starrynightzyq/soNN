@@ -10,35 +10,39 @@ import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
 import simulator._
 
-class PEArrayTest(c: PEArrayTestTop) extends PeekPokeTester(c) {
+class PEArrayConv1Test(c: PEArrayTestTop) extends PeekPokeTester(c) {
 
   val idle :: cal :: padd :: pdone :: hmove :: getdata :: alldone :: Nil = Enum(
     7
   )
 
-  val ichannelNum = 2
-  val ochannelNum = 3
-  val ifmapW = 5
-  val ifmapH = 5
-  val filterK = 3
-  val stepW = 1
-  val stepH = 1
-  val ofmapW = (ifmapW - filterK) / stepW + 1
-  val ofmapH = (ifmapH - filterK) / stepH + 1
-  val filterLen = filterK * ichannelNum * ochannelNum
-  val ifmapLen = filterK * ichannelNum
-  val relu = 1
-  val ID = 1
+  // -------------------- 配置 ------------------------
+  val ichannelNum = 1 // 输入通道
+  val ochannelNum = 28 // 输出通道
+  val ifmapH = 26 // 输入图像高度 == 行 == row
+  val ifmapW = 49 // 输入图像宽度 == 列 == col
+  val filterK = 3 // 卷积核的宽度（or 高度）目前只支持正方行的卷积核
+  val stepH = 1 // 步长的高度（垂直方向的步长）
+  val stepW = 2 // 步长的宽度（水平方向的步长）
+  val ofmapW = (ifmapW - filterK) / stepW + 1 // 输出图像的宽度 == 列 == col
+  val ofmapH = (ifmapH - filterK) / stepH + 1 // 输出图像的高度 == 行 == row
+  val filterLen = filterK * ichannelNum * ochannelNum // 单次一维卷积需要的卷积核数据量
+  val ifmapLen = filterK * ichannelNum // 单次卷积需要的图像数据量
+  val relu = 1 // 是否激活
+  val ID = 1 // 暂时没用到
 
+  // -------------------- 随机生成的数据 ---------------------------
   val filters = DenseMatrix.fill(ichannelNum, ochannelNum)(
     SW.randomMatrix((filterK, filterK))
   )
-  val ifmaps = DenseMatrix.fill(ichannelNum, 1)(SW.randomMatrix(ifmapW, ifmapH))
+  val ifmaps = DenseMatrix.fill(ichannelNum, 1)(SW.randomMatrix(ifmapH, ifmapW))
   val bias = SW.randomMatrix(ochannelNum, 1)
   // val bias = DenseMatrix.fill(ochannelNum, 1)(0)
 
-  // 行为级仿真
-  val sw = model.conv4d(filters, ifmaps, bias, ichannelNum, ochannelNum, filterK, ofmapW, ofmapH, stepW, stepH, (relu==1))
+  println(
+    s"ifmap: ${ifmapH}x${ifmapW}x${ichannelNum}, ofmap: ${ofmapH}x${ofmapW}x${ochannelNum}, step: ${stepH}x${stepW}"
+  )
+  println(s"filterLen = ${filterLen}, ifmapLen = ${ifmapLen}")
 
   println("filters: ")
   filters.map((x) => {
@@ -51,13 +55,30 @@ class PEArrayTest(c: PEArrayTestTop) extends PeekPokeTester(c) {
     println()
   })
 
-  // output
+  // ---------------------- 行为级仿真 -----------------------------
+  val sw = model.conv4d(
+    filters,
+    ifmaps,
+    bias,
+    ichannelNum,
+    ochannelNum,
+    filterK,
+    ofmapW,
+    ofmapH,
+    stepW,
+    stepH,
+    (relu == 1)
+  )
+
+  // ----------------------- rtl 仿真 ------------------------------
+
+  // ------------------------ output 设置 -----------------------------
   c.io.oSumOut.foreach((x) => {
-    poke(x.ready, 1)
+    poke(x.ready, 0)
   })
   step(1)
 
-  // config
+  // ----------------------------- config -----------------------------
   poke(c.io.stateSW, idle)
   step(1)
   poke(c.io.peconfig.valid, 1)
@@ -81,7 +102,7 @@ class PEArrayTest(c: PEArrayTestTop) extends PeekPokeTester(c) {
   poke(c.io.stateSW, alldone)
   step(1)
 
-  // filters
+  // ----------------------------- filters -----------------------------
   for (col <- Range(0, filterK)) {
     for (ic <- Range(0, ichannelNum)) {
       for (oc <- Range(0, ochannelNum)) {
@@ -101,19 +122,19 @@ class PEArrayTest(c: PEArrayTestTop) extends PeekPokeTester(c) {
   poke(c.io.dataIn.valid, 0.U)
   step(1)
 
-  // ifmaps
+  // ----------------------------- ifmaps -----------------------------
   for (col <- Range(0, ifmapW)) {
     for (ic <- Range(0, ichannelNum)) {
       for (arrayrow <- Range(0, filterK)) {
         for (arraycol <- Range(0, ofmapH)) {
           assert(peek(c.io.dataIn.ready) == 1)
-          val itmp = ifmaps(ic, 0)(arrayrow+stepH*arraycol, col)
+          val itmp = ifmaps(ic, 0)(arrayrow + stepH * arraycol, col)
 
           poke(c.io.dataIn.valid, 1.U)
           poke(c.io.dataIn.bits.data, itmp)
           poke(c.io.dataIn.bits.dataType, 1.U)
           poke(c.io.dataIn.bits.positon.row, arrayrow)
-          poke(c.io.dataIn.bits.positon.col, arraycol+1)
+          poke(c.io.dataIn.bits.positon.col, arraycol + 1)
           step(1)
         }
       }
@@ -122,7 +143,7 @@ class PEArrayTest(c: PEArrayTestTop) extends PeekPokeTester(c) {
   poke(c.io.dataIn.valid, 0.U)
   step(1)
 
-  // bias
+  // ----------------------------- bias -----------------------------
   for (ocol <- Range(0, ofmapW)) {
     for (oc <- Range(0, ochannelNum)) {
       assert(peek(c.io.dataIn.ready) == 1)
@@ -138,31 +159,39 @@ class PEArrayTest(c: PEArrayTestTop) extends PeekPokeTester(c) {
   poke(c.io.dataIn.valid, 0.U)
   step(1)
 
-  // 获取输出
+  // ------------------------ output 设置 -----------------------------
+  c.io.oSumOut.foreach((x) => {
+    poke(x.ready, 1)
+  })
+  // step(1)
+
+  // ----------------------------- 获取输出 -----------------------------
   println("ofmaps:")
-  var ofmaps = DenseMatrix.fill(ochannelNum, 1)(DenseMatrix.fill(ofmapH, ofmapW)(0))
+  var ofmaps =
+    DenseMatrix.fill(ochannelNum, 1)(DenseMatrix.fill(ofmapH, ofmapW)(0))
   var ocnt = 0
   var colcnt = 0
   var error = 0
   while (peek(c.io.done) == 0) {
-    if(peek(c.io.oSumOut(0).valid) == 1){
+    if (peek(c.io.oSumOut(0).valid) == 1) {
       for (i <- c.io.oSumOut.indices) {
         var otmp = 0
         otmp = peek(c.io.oSumOut(i).bits).toInt
         // println(s"i = ${i}, o = ${otmp}")
 
-        ofmaps(ocnt,0)(i,colcnt) = otmp
+        ofmaps(ocnt, 0)(i, colcnt) = otmp
 
-        expect(c.io.oSumOut(i).bits, sw(ocnt,0)(i,colcnt))
-        if (otmp != sw(ocnt,0)(i,colcnt)) {
+        // 与行为级仿真对比
+        expect(c.io.oSumOut(i).bits, sw(ocnt, 0)(i, colcnt))
+        if (otmp != sw(ocnt, 0)(i, colcnt)) {
           error += 1
         }
 
       }
-      if(ocnt == ochannelNum-1){
+      if (ocnt == ochannelNum - 1) {
         ocnt = 0
         colcnt = colcnt + 1
-      }else{
+      } else {
         ocnt = ocnt + 1
       }
     }
@@ -177,23 +206,25 @@ class PEArrayTest(c: PEArrayTestTop) extends PeekPokeTester(c) {
   println(s"===============ERROR: ${error}======================")
 }
 
-class PEArrayTester extends ChiselFlatSpec {
+class PEArrayConv1Tester extends ChiselFlatSpec {
   "running with --generate-vcd-output on" should "create a vcd file from your test" in {
     iotesters.Driver.execute(
       Array(
         "--generate-vcd-output",
         "on",
         "--target-dir",
-        "test_run_dir/PEArray",
+        "test_run_dir/PEArrayConv1",
         "--top-name",
         "make_Test_vcd",
         "--backend-name",
         "verilator"
       ),
-      () => new PEArrayTestTop((3, 3), 16)
+      () => new PEArrayTestTop((3, 24), 16, 256)
     ) { c =>
-      new PEArrayTest(c)
+      new PEArrayConv1Test(c)
     } should be(true)
-    new File("test_run_dir/PEArray/PEArrayTestTop.vcd").exists should be(true)
+    new File("test_run_dir/PEArrayConv1/PEArrayTestTop.vcd").exists should be(
+      true
+    )
   }
 }

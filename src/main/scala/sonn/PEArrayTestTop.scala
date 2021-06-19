@@ -3,7 +3,7 @@ package sonn
 import chisel3._
 import chisel3.util._
 
-class PEArrayTestTop(val shape: (Int, Int), w: Int=16) extends Module{
+class PEArrayTestTop(val shape: (Int, Int), w: Int=16, fifolen: Int = 256) extends Module{
   val io = IO(new Bundle{
     val dataIn = Flipped(DecoupledIO(new dataPackage(w).cloneType))
     val stateSW = Input(UInt(2.W))
@@ -12,9 +12,9 @@ class PEArrayTestTop(val shape: (Int, Int), w: Int=16) extends Module{
     val done = Output(UInt(1.W))
   })
 
-  val pearray = Module(new PEArray((3, 3), 16, 5, 256))
+  val pearray = Module(new PEArray((shape._1, shape._2), w, 5, fifolen))
 
-  val dInQ = Queue(io.dataIn, 256)
+  val dInQ = Queue(io.dataIn, 81920)
 
   pearray.io.dataIn <> dInQ
   pearray.io.stateSW <> io.stateSW

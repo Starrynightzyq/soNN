@@ -42,7 +42,7 @@ class PE(
 
   // Cnt
   val colCnt = Counter(256)
-  val trashCnt = Counter(16)
+  val trashCnt = Counter(256)
   val getdataCnt = Counter(256)
 
   // trash to consume the data in the FIFO Consume the data in the FIFO when moving the convolution kernel horizontally
@@ -150,11 +150,12 @@ class PE(
     }
     is(hmove) {
       // when hmove, pe should idle
+      // 水平移动
       pstateSWReg := idle
 
       when(io.ifmap.fire()) {
         when(
-          trashCnt.value >= (configReg.stepH * configReg.ichannelNum) - 1.U
+          trashCnt.value >= (configReg.stepW * configReg.ichannelNum) - 1.U
         ) {
           state := cal
         }.otherwise {

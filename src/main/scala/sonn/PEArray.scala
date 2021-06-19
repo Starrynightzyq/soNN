@@ -33,7 +33,7 @@ class PEArray(val shape: (Int, Int), w: Int = 16, nodefifolen: Int = 5, pefifole
     for (j <- Range(0, shape._2 + 1)) { // 第 0 列是列广播器
       val node = Module(new Node(j == 0, (i, j), w, nodefifolen))
       if (j != 0) {
-        val pe = Module(new PETop)
+        val pe = Module(new PETop(w, pefifolen))
         val ds = Module(new dataSwitch())
         ds.io.dataIn <> node.io.dataPackageOut
         pe.io.filter <> ds.io.filter
@@ -98,7 +98,9 @@ class PEArray(val shape: (Int, Int), w: Int = 16, nodefifolen: Int = 5, pefifole
   val idle :: cal :: padd :: pdone :: hmove :: getdata :: alldone :: Nil = Enum(
     7
   )
-  doneReg := pes.map(_.map(_.io.stateOut === alldone)).flatten.reduce(_ & _)
+
+  // doneReg := pes.map(_.map(_.io.stateOut === alldone)).flatten.reduce(_ | _)
+  doneReg := pes(shape._1-1).map(_.io.stateOut === alldone).reduce(_ | _)
 
   // peconfig ready
   io.peconfig.ready := pes.map(_.map(_.io.peconfig.ready)).flatten.reduce(_ | _)

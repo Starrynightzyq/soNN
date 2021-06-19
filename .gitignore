@@ -10,6 +10,8 @@
 !build.sc
 !README.md
 !.scalafmt.conf
+!pic/
+!pic/*
 
 .*/
 project/

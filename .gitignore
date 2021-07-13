@@ -14,6 +14,7 @@
 !pic/*
 !paper/
 !paper/*.md
+!paper/*.docx
 #!paper/*.pdf
 
 .*/

@@ -12,6 +12,9 @@
 !.scalafmt.conf
 !pic/
 !pic/*
+!paper/
+!paper/*.md
+#!paper/*.pdf
 
 .*/
 project/

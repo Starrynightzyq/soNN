@@ -5,8 +5,8 @@ import chisel3.util._
 import myutil._
 
 class PE(
-  filterSpadLen: Int = 225,
-  imgSpadLen: Int = 225,
+  filterSpadLen: Int = 2048,
+  imgSpadLen: Int = 256,
   pSumMemLen: Int = 256,
   w: Int = 16
 ) extends Module {
@@ -43,7 +43,7 @@ class PE(
   // Cnt
   val colCnt = Counter(256)
   val trashCnt = Counter(256)
-  val getdataCnt = Counter(256)
+  val getdataCnt = Counter(2048)
 
   // trash to consume the data in the FIFO Consume the data in the FIFO when moving the convolution kernel horizontally
   val trash = RegInit(0.S(w.W))

@@ -12,7 +12,7 @@ import simulator._
 
 // -------------------- 配置 ------------------------
 object config{
-  val ichannelNum = 3 // 输入通道
+  val ichannelNum = 28 // 输入通道
   val ochannelNum = 24 // 输出通道
   val ifmapH = 24 // 输入图像高度 == 行 == row
   val ifmapW = 24 // 输入图像宽度 == 列 == col
@@ -244,7 +244,7 @@ class PEArrayConv2Tester extends ChiselFlatSpec {
     iotesters.Driver.execute(
       Array(
         // "--generate-vcd-output",
-        // "on",
+        // "off",
         "--target-dir",
         "test_run_dir/PEArrayConv2",
         "--top-name",
@@ -256,8 +256,8 @@ class PEArrayConv2Tester extends ChiselFlatSpec {
     ) { c =>
       new PEArrayConv2Test(c)
     } should be(true)
-    new File("test_run_dir/PEArrayConv2/PEArrayTestTop.vcd").exists should be(
-      true
-    )
+    // new File("test_run_dir/PEArrayConv2/PEArrayTestTop.vcd").exists should be(
+    //   true
+    // )
   }
 }

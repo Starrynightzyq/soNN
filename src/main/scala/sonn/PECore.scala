@@ -52,7 +52,7 @@ class PECore(w:Int = 16)
     val idle :: cal :: add :: done:: Nil = Enum(4)
     val state = RegInit(idle)
 
-    val calCnt = Counter(256)
+    val calCnt = Counter(2048)
     val clrCnt = Counter(256)
     val ichannelCnt = Counter(256)
     val ochannelCnt = Counter(256)

@@ -25,6 +25,7 @@ vivado_proj/
 bak/
 DW_ram_r_w_s_dff.v
 
+test_run_dir/*
 !test_run_dir/PEArray/*.v
 
 !behavioral-level-matlab/*.m

@@ -34,10 +34,10 @@ object getVerilogPE extends App {
 
 // 生成 3行24列的矩阵
 // 每个 node 带深度为 5 的 FIFO
-// 每个 PE 的输入输出都带深度为 256 的 FIFO
+// 每个 PE 的输入输出都带深度为 2048 的 FIFO
 object getVerilogPEArray extends App {
   println("generate PEArray verilog")
   (new ChiselStage).execute(
     Array("-X", "verilog", "--target-dir", "test_run_dir/PEArray"),
-    Seq(ChiselGeneratorAnnotation(() => new PEArray((3, 24), 5, 16, 256))))
+    Seq(ChiselGeneratorAnnotation(() => new PEArray((3, 24), 5, 16, 2048))))
 }

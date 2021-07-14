@@ -273,3 +273,39 @@ PE 单元的设计分为 3 层，最里层 *PE Core* 的逻辑可以实现单个
 [9] Y.-H. Chen, T.-J. Yang, J. Emer, and V. Sze, “Eyeriss v2: A Flexible Accelerator for Emerging Deep Neural Networks on Mobile Devices,” *arXiv Prepr. arXiv1807.07928*, 2018.
 
 [10] https://www.chisel-lang.org/
+
+# 附录A：附件包含内容
+
+附件结构如下：
+
+~~~bash
+.
+├── build.sbt              # 编译脚本
+├── build.sc
+├── LICENSE
+├── paper                  # 设计报告
+│   ├── report.docx
+│   └── report.md
+├── pic
+├── README.md
+├── src                    # 代码 
+│   ├── main
+│   │   ├── resources      # verilog 代码
+│   │   └── scala
+│   │       ├── adder
+│   │       ├── myutil
+│   │       └── sonn       # 主要 chisel 代码
+│   └── test
+│       └── scala
+│           ├── adder
+│           ├── myutil
+│           ├── simulator
+│           └── sonn       # 测试代码
+└── test_run_dir
+    └── PEArray						 # chisel 生成的 verilog 代码
+~~~
+
+# 附录B：代码使用方法
+
+代码使用方法见附件 *README.md*。
+

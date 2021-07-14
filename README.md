@@ -64,10 +64,35 @@ You can find Verilog code in folder *test_run_dir/PEArray*.
 
 - [ ] 上板测试；
 
-> more
+## File Tree
+
+~~~bash
+.
+├── build.sbt               # 编译脚本
+├── build.sc
+├── LICENSE
+├── paper                   # 设计报告
+├── pic
+├── README.md
+├── behavioral-level-matlab # matlab 行为级仿真代码
+├── src                     # chisel 代码 
+│   ├── main
+│   │   ├── resources       # verilog 代码
+│   │   └── scala
+│   │       ├── adder
+│   │       ├── myutil
+│   │       └── sonn        # 主要 chisel 代码
+│   └── test
+│       └── scala
+│           ├── adder
+│           ├── myutil
+│           ├── simulator
+│           └── sonn        # 测试代码
+└── test_run_dir
+    └── PEArray						  # chisel 生成的 verilog 代码
+~~~
 
 ## Details
 
 [设计报告](paper/report.md)
-
 

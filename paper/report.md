@@ -280,29 +280,28 @@ PE 单元的设计分为 3 层，最里层 *PE Core* 的逻辑可以实现单个
 
 ~~~bash
 .
-├── build.sbt              # 编译脚本
+├── build.sbt               # 编译脚本
 ├── build.sc
 ├── LICENSE
-├── paper                  # 设计报告
-│   ├── report.docx
-│   └── report.md
+├── paper                   # 设计报告
 ├── pic
 ├── README.md
-├── src                    # 代码 
-│   ├── main
-│   │   ├── resources      # verilog 代码
-│   │   └── scala
-│   │       ├── adder
-│   │       ├── myutil
-│   │       └── sonn       # 主要 chisel 代码
-│   └── test
-│       └── scala
-│           ├── adder
-│           ├── myutil
-│           ├── simulator
-│           └── sonn       # 测试代码
+├── behavioral-level-matlab # matlab 行为级仿真代码
+├── src                     # chisel 代码 
+│   ├── main
+│   │   ├── resources       # verilog 代码
+│   │   └── scala
+│   │       ├── adder
+│   │       ├── myutil
+│   │       └── sonn        # 主要 chisel 代码
+│   └── test
+│       └── scala
+│           ├── adder
+│           ├── myutil
+│           ├── simulator
+│           └── sonn        # 测试代码
 └── test_run_dir
-    └── PEArray						 # chisel 生成的 verilog 代码
+    └── PEArray						  # chisel 生成的 verilog 代码
 ~~~
 
 # 附录B：代码使用方法
